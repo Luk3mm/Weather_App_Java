@@ -58,6 +58,15 @@ public class WeatherAppGui extends JFrame {
         humidityText.setBounds(75, 512, 85, 55);
         humidityText.setFont(new Font("Dialog", Font.PLAIN, 16));
         add(humidityText);
+
+        JLabel speedWindImage = new JLabel(loadImage("src/images/vento.png"));
+        speedWindImage.setBounds(220, 510, 74, 66);
+        add(speedWindImage);
+
+        JLabel speedWindText = new JLabel("<html><b>Windspeed</b> 15km/h</html>");
+        speedWindText.setBounds(310, 512, 85, 55);
+        speedWindText.setFont(new Font("Dialog", Font.PLAIN, 16));
+        add(speedWindText);
     }
 
     private ImageIcon loadImage(String resourcePath){
