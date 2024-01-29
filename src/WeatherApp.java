@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 public class WeatherApp {
@@ -44,6 +45,26 @@ public class WeatherApp {
 
             JSONArray time = (JSONArray) hourly.get("time");
             int index = findIndexOfCurrentTime(time);
+
+            JSONArray temperatureData = (JSONArray) hourly.get("temperature_2m");
+            double temperature = (double) temperatureData.get(index);
+
+            JSONArray weatherCode = (JSONArray) hourly.get("weather_code");
+            String weatherCondition = convertWeatherCode((long) weatherCode.get(index));
+
+            JSONArray relativeHumidity = (JSONArray) hourly.get("relative_humidity_2m");
+            long humidity = (long) relativeHumidity.get(index);
+
+            JSONArray windSpeedData = (JSONArray) hourly.get("wind_speed_10m");
+            double windSpeed = (double) windSpeedData.get(index);
+
+            JSONObject weatherData = new JSONObject();
+            weatherData.put("temperature", temperature);
+            weatherData.put("weather_condition", weatherCondition);
+            weatherData.put("humidity", humidity);
+            weatherData.put("windspeed", windSpeed);
+
+            return weatherData;
         }
         catch(Exception e){
             e.printStackTrace();
@@ -111,9 +132,41 @@ public class WeatherApp {
 
     private static int findIndexOfCurrentTime(JSONArray timeList){
         String currentTime = getCurrentTime();
+
+        for(int i =0; i < timeList.size(); i++){
+            String time = (String) timeList.get(i);
+            if(time.equalsIgnoreCase(currentTime)){
+                return i;
+            }
+        }
+
+        return 0;
     }
 
     private static String getCurrentTime(){
         LocalDateTime currentDateTime = LocalDateTime.now();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH':00'");
+
+        String formatterDateTime = currentDateTime.format(formatter);
+        return formatterDateTime;
+    }
+
+    private static String convertWeatherCode(long weatherCode){
+        String weatherCondition = "";
+        if(weatherCode == 0L){
+            weatherCondition = "Clear";
+        }
+        else if(weatherCode <= 3L && weatherCode > 0L){
+            weatherCondition = "Cloudy";
+        }
+        else if((weatherCode >=51L && weatherCode <= 67L) || (weatherCode >= 80L && weatherCode <= 99L)){
+            weatherCondition = "Rain";
+        }
+        else if(weatherCode >= 71L && weatherCode <= 77L){
+            weatherCondition = "Snow";
+        }
+
+        return weatherCondition;
     }
 }
